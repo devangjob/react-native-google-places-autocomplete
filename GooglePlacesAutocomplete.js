@@ -18,8 +18,8 @@ import {
 import Qs from 'qs';
 import debounce from 'lodash.debounce';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Colours from '../../Src/Styles/colours';
-import fontFamily from '../../Src/resources/fonts/fontFamily';
+import colors from '../../Src/theme/colors';
+import fonts from '../../Src/theme/fonts';
 const WINDOW = Dimensions.get('window');
 
 const defaultStyles = {
@@ -55,11 +55,11 @@ const defaultStyles = {
     backgroundColor: '#FFFFFF',
   },
   areaDetails: {
-    color: Colours.primaryFocused,
+    ...fonts.bold,
+    color: colors.primaryFocused,
     textAlign: 'left',
     fontSize: 12,
     alignContent: 'flex-start',
-    fontFamily: fontFamily.avenirNextBold,
   },
   powered: {},
   listView: {},
@@ -552,7 +552,7 @@ export default class GooglePlacesAutocomplete extends Component {
       <ActivityIndicator
         animating={true}
         size="small"
-        color={Colours.primaryFocused}
+        color={colors.primaryFocused}
       />
     );
   }
@@ -566,7 +566,7 @@ export default class GooglePlacesAutocomplete extends Component {
         name="my-location"
         type="Solid"
         style={{height: 30, width: 30, marginRight: 10}}
-        color={Colours.primaryFocused}
+        color={colors.primaryFocused}
        /> 
       );
     } else if(rowData.name && rowData.name.toString().toLowerCase() === 'home'){
@@ -576,7 +576,7 @@ export default class GooglePlacesAutocomplete extends Component {
         name="home"
         type="Solid"
         style={{height: 30, width: 30, marginRight: 10}}
-        color={Colours.black}
+        color={colors.black}
        /> 
       );
     } else if(rowData.name && rowData.name.toString().toLowerCase() === 'work'){
@@ -586,7 +586,7 @@ export default class GooglePlacesAutocomplete extends Component {
         name="store"
         type="Solid"
         style={{height: 30, width: 30, marginRight: 10}}
-        color={Colours.black}
+        color={colors.black}
        /> 
       );
     } else {
@@ -596,7 +596,7 @@ export default class GooglePlacesAutocomplete extends Component {
         name="location-on"
         type="Solid"
         style={{height: 30, width: 30, marginRight: 10}}
-        color={Colours.black}
+        color={colors.black}
    />
        );
     }
@@ -605,7 +605,7 @@ export default class GooglePlacesAutocomplete extends Component {
   _getAddressDesign = (rowData) => {
     if(rowData.description && rowData.description.toString().toLowerCase() === 'use current location'){
       return(
-        <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {},{color:Colours.primaryFocused}]}
+        <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {},{color:colors.primaryFocused}]}
         numberOfLines={this.props.numberOfLines}>
         {this._renderDescription(rowData)}
       </Text>
@@ -701,7 +701,7 @@ export default class GooglePlacesAutocomplete extends Component {
         <TouchableHighlight
           style={{ width: WINDOW.width }}
           onPress={() => this._onPress(rowData)}
-          underlayColor={this.props.listUnderlayColor || Colours.gray}
+          underlayColor={this.props.listUnderlayColor || colors.gray}
         >
           <View style={[this.props.suppressDefaultStyles ? {} : defaultStyles.row, this.props.styles.row, rowData.isPredefinedPlace ? this.props.styles.specialItemRow : {}]}>
             {this._renderRowData(rowData)}
