@@ -18,8 +18,8 @@ import {
 import Qs from 'qs';
 import debounce from 'lodash.debounce';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from '../../Src/theme/colors';
-import fonts from '../../Src/theme/fonts';
+import colors from '../../src/theme/colors';
+import fonts from '../../src/theme/fonts';
 const WINDOW = Dimensions.get('window');
 
 const defaultStyles = {
