@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableHighlight,
+  TouchableOpacity,
   Platform,
   ActivityIndicator,
   PixelRatio,
@@ -59,6 +60,7 @@ const defaultStyles = {
     color: colors.primaryFocused,
     textAlign: 'left',
     fontSize: 12,
+    marginBottom: 5,
     alignContent: 'flex-start',
   },
   powered: {},
@@ -129,6 +131,12 @@ export default class GooglePlacesAutocomplete extends Component {
     this._request = this.props.debounce
       ? debounce(this._request, this.props.debounce)
       : this._request;
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.predefinedPlaces !== this.props.predefinedPlaces) {
+      this.setState({ dataSource: this.buildRowsFromResults(this._results) })
+    }
   }
 
   componentDidMount() {
@@ -358,12 +366,12 @@ export default class GooglePlacesAutocomplete extends Component {
   }
 
   _getPredefinedPlace = (rowData) => {
-    if (rowData.isPredefinedPlace !== true) {
+     if (rowData.isPredefinedPlace !== true || rowData.description == null) {
       return rowData;
     }
 
     for (let i = 0; i < this.props.predefinedPlaces.length; i++) {
-      if (this.props.predefinedPlaces[i].description === rowData.description) {
+      if (this.props.predefinedPlaces[i].id === rowData.id) {
         return this.props.predefinedPlaces[i];
       }
     }
@@ -477,7 +485,7 @@ export default class GooglePlacesAutocomplete extends Component {
         if (request.readyState !== 4) {
           return;
         }
-
+        console.log(request);
         if (request.status === 200) {
           const responseJSON = JSON.parse(request.responseText);
           if (typeof responseJSON.predictions !== 'undefined') {
@@ -528,7 +536,6 @@ export default class GooglePlacesAutocomplete extends Component {
 
   _onChangeText = (text) => {
     this._request(text);
-
     this.setState({
       text: text,
       listViewDisplayed: this._isMounted || this.props.autoFocus,
@@ -552,7 +559,7 @@ export default class GooglePlacesAutocomplete extends Component {
       <ActivityIndicator
         animating={true}
         size="small"
-        color={colors.primaryFocused}
+        color={colors.black}
       />
     );
   }
@@ -569,24 +576,24 @@ export default class GooglePlacesAutocomplete extends Component {
         color={colors.primaryFocused}
        /> 
       );
-    } else if(rowData.name && rowData.name.toString().toLowerCase() === 'home'){
+    } else if(rowData.addressType && rowData.addressType.toString().toLowerCase() === 'home'){
       return(
         <Icon
         size={30}
         name="home"
         type="Solid"
         style={{height: 30, width: 30, marginRight: 10}}
-        color={colors.black}
+        color={colors.primaryFocused}
        /> 
       );
-    } else if(rowData.name && rowData.name.toString().toLowerCase() === 'work'){
+    } else if(rowData.addressType && rowData.addressType.toString().toLowerCase() === 'work'){
       return(
         <Icon
         size={30}
         name="store"
         type="Solid"
         style={{height: 30, width: 30, marginRight: 10}}
-        color={colors.black}
+        color={colors.primaryFocused}
        /> 
       );
     } else {
@@ -596,7 +603,7 @@ export default class GooglePlacesAutocomplete extends Component {
         name="location-on"
         type="Solid"
         style={{height: 30, width: 30, marginRight: 10}}
-        color={colors.black}
+        color={colors.primaryFocused}
    />
        );
     }
@@ -605,14 +612,20 @@ export default class GooglePlacesAutocomplete extends Component {
   _getAddressDesign = (rowData) => {
     if(rowData.description && rowData.description.toString().toLowerCase() === 'use current location'){
       return(
-        <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {},{color:colors.primaryFocused}]}
+        <View style={{flex:1,flexDirection:'row', justifyContent:'space-between'}}>
+        <View style={{flex:1, flexDirection:'column', justifyContent:'center'}}>
+        <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {},{color:colors.black}]}
         numberOfLines={this.props.numberOfLines}>
         {this._renderDescription(rowData)}
       </Text>
+      </View>
+
+       </View>
       );
-    }else if (rowData.name && rowData.name.toString().toLowerCase() === 'home'){
+    }else if (rowData.addressType && rowData.addressType.toString().toLowerCase() === 'home'){
       return(
-        <View style={{flexDirection:'column', justifyContent:'flex-start', alignContent:'center'}}>
+        <View style={{flex:1,flexDirection:'row', justifyContent:'space-between', alignItems:'center',}}>
+        <View style={{flex:1, flexDirection:'column', justifyContent:'space-between', alignItems:'flex-start'}}>
         <Text style={defaultStyles.areaDetails}>HOME</Text>
         <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {}]}
         numberOfLines={this.props.numberOfLines}
@@ -620,10 +633,21 @@ export default class GooglePlacesAutocomplete extends Component {
         {this._renderDescription(rowData)}
       </Text>
       </View>
+      <TouchableOpacity onPress={() => {this.props.onDeleteAddress(rowData)}}>
+      <Icon
+       size={30}
+        name="cancel"
+        type="Solid"
+        style={{marginRight:0 , marginTop: 9, height: 30, width: 30, marginHorizontal: 5}}
+        color={colors.lightGray}
+        />
+        </TouchableOpacity>
+      </View>
       );
-    }else if (rowData.name && rowData.name.toString().toLowerCase() === 'work'){
+    }else if (rowData.addressType && rowData.addressType.toString().toLowerCase() === 'work'){
       return(
-        <View style={{flexDirection:'column', justifyContent:'flex-start', alignContent:'center'}}>
+        <View style={{flex:1,flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+        <View style={{flex:1, flexDirection:'column', justifyContent:'space-between', alignItems:'flex-start' }}>
         <Text style={defaultStyles.areaDetails}>WORK</Text>
         <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {}]}
         numberOfLines={this.props.numberOfLines}
@@ -631,16 +655,37 @@ export default class GooglePlacesAutocomplete extends Component {
         {this._renderDescription(rowData)}
       </Text>
       </View>
+      <TouchableOpacity onPress={() => {this.props.onDeleteAddress(rowData)}}>
+      <Icon
+       size={30}
+        name="cancel"
+        type="Solid"
+        style={{marginRight:0 , marginTop: 9, height: 30, width: 30, marginHorizontal: 5}}
+        color={colors.lightGray}
+        />
+        </TouchableOpacity>
+      </View>
       );
-    }else if (rowData.name && rowData.name.toString().toLowerCase() === 'other'){
+    }else if (rowData.addressType && rowData.addressType.toString().toLowerCase() === 'other'){
       return(
-        <View style={{flexDirection:'column', justifyContent:'flex-start', alignContent:'center'}}>
+        <View style={{flex:1,flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+        <View style={{flex:1, flexDirection:'column', justifyContent:'space-between', alignItems:'flex-start'}}>
         <Text style={defaultStyles.areaDetails}>OTHER</Text>
         <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {}]}
         numberOfLines={this.props.numberOfLines}
       >
         {this._renderDescription(rowData)}
       </Text>
+      </View>
+      <TouchableOpacity onPress={() => {this.props.onDeleteAddress(rowData)}}>
+      <Icon
+       size={30}
+        name="cancel"
+        type="Solid"
+        style={{marginRight:0 , marginTop: 9, height: 30, width: 30, marginHorizontal: 5}}
+        color={colors.lightGray}
+        />
+        </TouchableOpacity>
       </View>
       );
     } else {
@@ -661,8 +706,8 @@ export default class GooglePlacesAutocomplete extends Component {
     }
 
     return (
-      <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
-     {this._renderLoader(rowData)}
+      <View style={{flex:1,flexDirection:'row',alignItems:'center', justifyContent:'flex-start'}}>
+        {this._renderLoader(rowData)}
         {this._getLocationDesignIcon(rowData)}
         {this._getAddressDesign(rowData)}
       </View>
@@ -674,7 +719,7 @@ export default class GooglePlacesAutocomplete extends Component {
       return this.props.renderDescription(rowData);
     }
 
-    return rowData.description || rowData.formatted_address || rowData.name;
+    return rowData.description || rowData.formatted_address || rowData.name ;
   }
 
   _renderLoader = (rowData) => {
@@ -859,6 +904,7 @@ GooglePlacesAutocomplete.propTypes = {
   returnKeyType: PropTypes.string,
   keyboardAppearance: PropTypes.oneOf(['default', 'light', 'dark']),
   onPress: PropTypes.func,
+  onDeleteAddress:PropTypes.func,
   onNotFound: PropTypes.func,
   onFail: PropTypes.func,
   minLength: PropTypes.number,
@@ -905,6 +951,7 @@ GooglePlacesAutocomplete.defaultProps = {
   returnKeyType: 'default',
   keyboardAppearance: 'default',
   onPress: () => {},
+  onDeleteAddress: () => {},
   onNotFound: () => {},
   onFail: () => {},
   minLength: 0,
