@@ -316,10 +316,16 @@ export default class GooglePlacesAutocomplete extends Component {
       // display loader
       this._enableRowLoader(rowData);
 
-      this.setState({
-        text: this._renderDescription( rowData ),
-      });
-
+      if(rowData.description && rowData.description.toString().toLowerCase() === 'use current location'){
+        this.setState({
+          text: "",
+        });
+      }
+      else{
+        this.setState({
+          text: this._renderDescription( rowData ),
+        });
+      }
       this.triggerBlur(); // hide keyboard but not the results
       delete rowData.isLoading;
       this.getCurrentLocation();
@@ -611,10 +617,11 @@ export default class GooglePlacesAutocomplete extends Component {
 
   _getAddressDesign = (rowData) => {
     if(rowData.description && rowData.description.toString().toLowerCase() === 'use current location'){
+  
       return(
         <View style={{flex:1,flexDirection:'row', justifyContent:'space-between'}}>
         <View style={{flex:1, flexDirection:'column', justifyContent:'center'}}>
-        <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {},{color:colors.black}]}
+        <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {color:colors.black},{color:colors.black}]}
         numberOfLines={this.props.numberOfLines}>
         {this._renderDescription(rowData)}
       </Text>
@@ -689,12 +696,16 @@ export default class GooglePlacesAutocomplete extends Component {
       </View>
       );
     } else {
-      return(
+      return(  
+<View style={{flex:1,flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+     
         <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {}]}
         numberOfLines={this.props.numberOfLines}
       >
         {this._renderDescription(rowData)}
       </Text>
+    
+      </View>
       );
     }
 
@@ -719,7 +730,7 @@ export default class GooglePlacesAutocomplete extends Component {
       return this.props.renderDescription(rowData);
     }
 
-    return rowData.description || rowData.formatted_address || rowData.name ;
+    return rowData.description || rowData.formatted_address || rowData.vicinity ;
   }
 
   _renderLoader = (rowData) => {
