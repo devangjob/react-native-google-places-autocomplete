@@ -257,7 +257,6 @@ export default class GooglePlacesAutocomplete extends Component {
 
         if (request.status === 200) {
           const responseJSON = JSON.parse(request.responseText);
-          console.log("responseJSON",responseJSON);
           if (responseJSON.status === 'OK') {
             if (this._isMounted === true) {
               const details = responseJSON.result;
@@ -491,7 +490,6 @@ export default class GooglePlacesAutocomplete extends Component {
         if (request.readyState !== 4) {
           return;
         }
-        console.log(request);
         if (request.status === 200) {
           const responseJSON = JSON.parse(request.responseText);
           if (typeof responseJSON.predictions !== 'undefined') {
@@ -640,6 +638,7 @@ export default class GooglePlacesAutocomplete extends Component {
         {this._renderDescription(rowData)}
       </Text>
       </View>
+      {this.state.dataSource && this.state.dataSource.length > 2 && 
       <TouchableOpacity onPress={() => {this.props.onDeleteAddress(rowData)}}>
       <Icon
        size={30}
@@ -649,6 +648,7 @@ export default class GooglePlacesAutocomplete extends Component {
         color={colors.lightGray}
         />
         </TouchableOpacity>
+      }
       </View>
       );
     }else if (rowData.addressType && rowData.addressType.toString().toLowerCase() === 'work'){
@@ -662,6 +662,7 @@ export default class GooglePlacesAutocomplete extends Component {
         {this._renderDescription(rowData)}
       </Text>
       </View>
+      {this.state.dataSource && this.state.dataSource.length > 2 && 
       <TouchableOpacity onPress={() => {this.props.onDeleteAddress(rowData)}}>
       <Icon
        size={30}
@@ -671,6 +672,7 @@ export default class GooglePlacesAutocomplete extends Component {
         color={colors.lightGray}
         />
         </TouchableOpacity>
+      }
       </View>
       );
     }else if (rowData.addressType && rowData.addressType.toString().toLowerCase() === 'other'){
@@ -684,6 +686,7 @@ export default class GooglePlacesAutocomplete extends Component {
         {this._renderDescription(rowData)}
       </Text>
       </View>
+      {this.state.dataSource && this.state.dataSource.length > 2 && 
       <TouchableOpacity onPress={() => {this.props.onDeleteAddress(rowData)}}>
       <Icon
        size={30}
@@ -693,6 +696,7 @@ export default class GooglePlacesAutocomplete extends Component {
         color={colors.lightGray}
         />
         </TouchableOpacity>
+      }
       </View>
       );
     } else {
